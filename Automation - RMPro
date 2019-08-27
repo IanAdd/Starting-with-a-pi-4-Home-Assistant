@@ -1,0 +1,47 @@
+As mentioned in the readme my objective is to automate blinds up based upon weather and sun.
+
+Background
+My windows with blinds face east in Sydney Australia. In winter the overnight temperatures are low and sunshine into the room is desirable whereas in summer shade is much needed.
+
+Components
+sun
+weather
+indoor temperature
+blinds_up
+
+I am going to assume that sun and weather are already in your HA system as basics. If you need help with temperature then read the Sensibo - Aircon document. I am using my air-conditioning unit to tell me the temperature, you may have a sensor as part of something else or a chip connected direct to your pi's GPIO.
+
+1) sun
+
+We can obtain elevation of the sun which is much preferable over dawn (or dusk) as you want the sun up a certain amount before it delivers heat.
+
+At this stage I am working on 4 degrees above horizon.
+
+2) weather
+
+If it is a wet and grey day then the sun won't be doing much heating so let's hold off on the blinds.
+
+3) temperature
+
+If the room is already warm then keep the blinds down until someone gets up and wants them open.
+
+So this is just stuff to put into automation.yaml. You can use the helpful UI in HA 'configuration' 'Automations' to set this up or enter it direct into the yaml file as shown below.
+
+- id: '1566687871923'
+  alias: Sun up Actions
+  trigger:
+  - above: '+4'
+    entity_id: sun.sun
+    platform: numeric_state
+    value_template: '{{ state.attributes.elevation }}'
+  condition:
+  - below: '24'
+    condition: numeric_state
+    entity_id: climate.narrabeenac
+  - condition: state
+    entity_id: weather.narrabeen
+    state: sunny
+  action:
+  - alias: ''
+    data: {}
+    service: script.blinds_up
