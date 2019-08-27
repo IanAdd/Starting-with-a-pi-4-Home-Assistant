@@ -1,0 +1,59 @@
+I am going to use my RMPro to operate my RF capable roller blinds.
+
+Key objective
+- Be able to automate blinds up and down based on time, sun and weather
+
+Background
+The blinds are already working with my Google Home, eg say 'open blinds' causes them to go up (via the RMPro)
+I am doing this using HA 0.97
+
+Initial discoveries
+The Google Home works on the button names I set up in my RMPro using IHC app on phone. So far as I have been able to determine HA only works on sending base64 character sequences so getting those codes requires me to go back to the beginning with RMPro.
+
+Lots of google searches and help from others reveals the following.
+
+Ok let's do it.
+
+1) Get the Broadlink IHC app onto your phone (tested on Android), get that linked to your RMPro following the app's instructions.
+
+2) edit the configuration.yaml file
+
+switch:
+  - platform: broadlink
+    host: 192.168.0.4  # recommend fixing its ip in your router since this config requires the ip
+    mac: 'xx:xx:xx:xx:xx:xx'
+    type: rm2_pro_plus  # its actually a RM pro+ on the label
+
+3) Now restart HA
+
+4) Next go to the 'developer tools' page in your HA and select the 'Services' tab
+In service dropdown you should find and select 'broadlink.learn'
+In service data enter the following:
+{"host":"192.168.0.4"}
+
+5) Next get your phone, RMpro and your usual remote together next to your keyboard to do the following:
+
+a) Go into IHC app and get to the point where you are asking it to learn (or relearn) a button. This prompts you to long press any button on the remote. Do this until the app tells you its recognised.
+b) Now briefly press the button that will do the job you want and AND press the 'Call Service' button in HA.
+
+The notifications tab in HA should show a new message. Check to see it has a big long code shown. If not then repeat the two steps above. If HA reports an error when you press the 'Call Service' button then you've probably not done step 4 correctly.
+
+6) Copy the whole string of characters (excluding the quotes) from the notification. and then open the scripts.yaml in HA and add the following:
+
+blinds_up:
+  sequence:
+    - service: broadlink.send
+      data:
+        host: 192.168.0.4
+        packet: "sgDYAAwXGQsMFxkLDBgYCwwYDBcZCwwYGAsMGAwXDRcMGAwXDBgMFw0XDBgYCxgMGAwYCwx9njENFxgMDBcYDAwXDRcYDBgLDBgMFxkLGAwMFwwYDBcNFxgLDRcYDAwXGAwMGAwXGAwMFxgMDBcNFwwYDBcNFwwXDRcNFwwXGAwYCxgMGAsNS54xDRcYCw0XGAwMFwwYGAsZCwwYDBcYDBgLDBgMGAwXDBgYCw0XGAsNFxgMDBcNFxgLDRcYCw0XDBgMGAwXDBgMFw0XDBgMFxgMGAsYDBgLDQAF3A=="
+
+Obviously your data string will differ.
+
+7) Save the file, restart HA and check that the script shows up in the 'Overview' (lovelace UI). If you are editing the UI yourself then I will assume that you are able to add a card to show the 'blinds_up' script.
+
+8) execute the script and check that it works.
+
+Notes:
+1) 'blinds_up' is what I want to call the item, it can be anything you want (without spaces in it). It will be what you specify when you want the script to run.
+2) your ip (192.168.0.4) will be different to mine!
+3) See Automation - Blinds for the next stage of the process
