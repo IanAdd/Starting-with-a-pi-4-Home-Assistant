@@ -39,6 +39,7 @@ So this is just stuff to put into automation.yaml. You can use the helpful UI in
   - below: '24'
     condition: numeric_state
     entity_id: climate.narrabeenac
+    value_template: '{{ state.attributes.current_temperature }}'
   - condition: state
     entity_id: weather.narrabeen
     state: sunny
