@@ -24,6 +24,7 @@ If it is a wet and grey day then the sun won't be doing much heating so let's ho
 3) temperature
 
 If the room is already warm then keep the blinds down until someone gets up and wants them open.
+I am using climate.narrabeenac which is my AC unit to tell me the current temperature
 
 So this is just stuff to put into automation.yaml. You can use the helpful UI in HA 'configuration' 'Automations' to set this up or enter it direct into the yaml file as shown below.
 
