@@ -26,7 +26,9 @@ If it is a wet and grey day then the sun won't be doing much heating so let's ho
 If the room is already warm then keep the blinds down until someone gets up and wants them open.
 I am using climate.narrabeenac which is my AC unit to tell me the current temperature
 
-So this is just stuff to put into automation.yaml. You can use the helpful UI in HA 'configuration' 'Automations' to set this up or enter it direct into the yaml file as shown below.
+So this is just stuff to put into automation.yaml. 
+It says that when the sun gets more than 4 degrees above the horizon then if its chilly in the room (<24c) and it is either sunny or at least no worse than partly cloudy then
+put the blinds up.
 
 - id: '1566687871923'
   alias: Sun up Actions
@@ -36,13 +38,20 @@ So this is just stuff to put into automation.yaml. You can use the helpful UI in
     platform: numeric_state
     value_template: '{{ state.attributes.elevation }}'
   condition:
-  - below: '24'
-    condition: numeric_state
-    entity_id: climate.narrabeenac
-    value_template: '{{ state.attributes.current_temperature }}'
-  - condition: state
-    entity_id: weather.narrabeen
-    state: sunny
+    condition: and
+    conditions:
+      - condition: numeric_state
+        below: '24'
+        entity_id: climate.narrabeenac
+        value_template: '{{ state.attributes.current_temperature }}'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: weather.narrabeen
+          state: sunny
+        - condition: state
+          entity_id: weather.narrabeen
+          state: partlycloudy
   action:
   - alias: ''
     data: {}
