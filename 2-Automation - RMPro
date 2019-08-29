@@ -33,7 +33,7 @@ put the blinds up.
 - id: '1566687871923'
   alias: Sun up Actions
   trigger:
-  - above: '+4'
+    above: +4.0
     entity_id: sun.sun
     platform: numeric_state
     value_template: '{{ state.attributes.elevation }}'
@@ -41,18 +41,18 @@ put the blinds up.
     condition: and
     conditions:
       - condition: numeric_state
-        below: '24'
+        below: 25
         entity_id: climate.narrabeenac
         value_template: '{{ state.attributes.current_temperature }}'
       - condition: or
         conditions:
         - condition: state
-          entity_id: weather.narrabeen
-          state: sunny
+          entity_id: weather.darksky
+          state: 'sunny'
         - condition: state
-          entity_id: weather.narrabeen
-          state: partlycloudy
+          entity_id: weather.darksky
+          state: 'partlycloudy'
   action:
-  - alias: ''
+    alias: ''
     data: {}
     service: script.blinds_up
