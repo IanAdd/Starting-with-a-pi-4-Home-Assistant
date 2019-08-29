@@ -1,0 +1,18 @@
+This is where I am up to with the project.
+
+Please ask if I haven't included stuff that interests you that I have stated that I have working here but haven't documented.
+
+As yet I am letting lovelace UI auto update. Later I will take over and manually set up pages, exclude irrelevant bits and prettify.
+
+Just received HA version 0.98
+
+Working bits:
+1) RMPro RF codes sorted, embedded in scripts and scripts used in automation. 29 Aug 2019
+2) Hue automation - got a Hue light to turn on/off based up the on/off state of another Hue light - use of the power switch !
+3) Hydrawise - integration loaded and showing in lovelace - no automations developed as yet
+
+Frustrations
+Sonos won't integrate with Google Home - don't want to explore HA use of Sonos or 'hey google' until this is sorted.
+yeelight integration not seeming to work with my oldish light strip - not given up yet
+Telstra Smart plug - not found an integration for this yet
+broadlink S2 hub - no progress on this yet. Will S1 stuff recognise it?
