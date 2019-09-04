@@ -1,0 +1,147 @@
+This is all copied from other users efforts. All I have sone is glued two offering together into delivering what is needed to get HA to work with the Tap Switch.
+
+A) Get the ip of your Hue Bridge, typically found by logging intoo your router/internet hub.
+
+1) Login here: <hue bridge ip>/debug/clip.html
+
+2) in the URL: box just have /api nothing else.
+
+3) in the Message Body box type: {"devicetype":"my_hue_app#user"} 
+
+4) Press the link button on the bridge
+
+5) Click "POST" button in the web browser. It should give you a long string for the new user you created.
+
+B) Add the longstring of characters to the /api and sensors on the end like this /api/longgobbldegook/sensors and press GET button
+
+This willl return something looking like Appendix 1 below. Note two things, you are looking for the Tap Switch which may be called Hue Tap Switch or another name that you gave it in the Hue app. Find that and look for the number in quotes at the start of that section, in the example below it is "6".
+
+Also check that the LastUpdated: for this entry has a value and is not nulll or blank. If it is blank then go into you phone's Hue app and Delete the hue tap accessory and then add it back. Then repeat step B.
+
+C) Now we can set up HA
+
+1) Stuff for conguration.yaml - See appendix 2
+
+a) Copy and paste that and then amend the two occurences of /Y on the end of lines to / and the number you found in B above, eg /6
+b) Amend the xxx.xxx.xxx.xxx to the ip of your hue bridge.
+
+2) Stuff for automation.yaml - See appendix 3
+
+a) copy and paste that and amend the light names to suit your lights names (without the "light." prefix as that is already in there. Not restricted to Hue lights.
+
+Save restart and test.! Each button should toggle your selected light on and off.
+
+
+Appendix 1
+{
+	"1": {
+		"state": {
+			"daylight": true,
+			"lastupdated": "2019-09-03T20:40:00"
+		},
+		"config": {
+			"on": true,
+			"configured": true,
+			"sunriseoffset": 30,
+			"sunsetoffset": -30
+		},
+		"name": "Daylight",
+		"type": "Daylight",
+		"modelid": "PHDL00",
+		"manufacturername": "Philips",
+		"swversion": "1.0"
+	},
+	"3": {
+		"state": {
+			"presence": false,
+			"lastupdated": "none"
+		},
+		"config": {
+			"on": true,
+			"reachable": true
+		},
+		"name": "HomeAway",
+		"type": "CLIPPresence",
+		"modelid": "HOMEAWAY",
+		"manufacturername": "GvLpRegsmWoGy763wsyBOQjSc6qg6Onx",
+		"swversion": "A_1",
+		"uniqueid": "L_01_VW4py",
+		"recycle": false
+	},
+	"4": {
+		"state": {
+			"status": 0,
+			"lastupdated": "none"
+		},
+		"config": {
+			"on": true,
+			"battery": null,
+			"reachable": true
+		},
+		"name": "Light status",
+		"type": "CLIPGenericStatus",
+		"modelid": "Model 2015",
+		"manufacturername": "all 4 hue",
+		"swversion": "1.0",
+		"uniqueid": "PFHS-LIGHT-STATE",
+		"recycle": false
+	},
+	"6": {
+		"state": {
+			"buttonevent": 34,
+			"lastupdated": "2019-09-04T02:57:13"
+		},
+		"config": {
+			"on": true
+		},
+		"name": "kitchen switch",
+		"type": "ZGPSwitch",
+		"modelid": "ZGPSWITCH",
+		"manufacturername": "Philips",
+		"uniqueid": "00:00:00:00:00:41:60:97-f2"
+	}
+}
+
+Appendix 2
+
+##
+# Hue Tap Switch
+##
+  - platform: rest
+    resource: http://xxx.xxx.xxx.xxx/api/03CYII80mSeiL4gKVrYj9ph-IR5fk73dCxJI-sbz/sensors/6
+    value_template: '{{ value_json.state.buttonevent }}'
+    name: 'Hue Tap'
+    scan_interval: 1
+  - platform: rest
+    resource: http://xxx.xxx.xxx.xxx/api/03CYII80mSeiL4gKVrYj9ph-IR5fk73dCxJI-sbz/sensors/6
+    value_template: '{{ value_json.state.lastupdated }}'
+    name: 'Hue Tap last updated'
+    scan_interval: 1
+
+Appendix 3
+
+##
+- id: tap_switching
+  alias: Hue tap switch controls
+  trigger:
+    - entity_id: sensor.hue_tap_last_updated
+      platform: state
+  action:
+  - delay:
+      milliseconds: 20
+  - data_template:
+      entity_id:
+      - light.
+        {%- if is_state('sensor.hue_tap', '34') -%}
+          lounge_corner
+        {%- elif is_state('sensor.hue_tap', '16') -%}
+          lounge
+        {%- elif is_state('sensor.hue_tap', '17') -%}
+          kitchen
+        {%- elif is_state('sensor.hue_tap', '18') -%}
+          hall
+        {%- else -%}
+          dummy
+        {% endif %}
+    service: light.toggle
+
