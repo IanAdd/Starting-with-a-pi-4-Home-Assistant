@@ -13,6 +13,7 @@ First a list of the stuff that my home has:
 - Windows 10 PC
 - Netgear router
 - Hue Lights
+- Hue tap Switch
 - Light Strips - various - XAIOMI, Yeelight
 - wifi controlled Under floor heating - SWATT
 - android phone - me
