@@ -6,15 +6,17 @@ First a list of the stuff that my home has:
     - Sonoff RF Bridge
     - Broadlink RMPRO
 - IR controlled Air Con
-- IR controller - Sensibo
+    - IR controller - Sensibo
 - Samsung smart TV
 - RF Controlled curtain 
     - Sonoff RF Bridge
 - Sonos speakers - bar, play 3, play 5, play one
 - Google Home devices
 - HP Envy Printer
+    - Inklevel monitoring
 - Windows 10 PC
 - Telstra / Arcadyan LH1000 router
+    - nbn / mobile mode monitoring
 - Hue Lights
 - Hue tap Switch
 - Light Strips - various - XAIOMI, Yeelight
