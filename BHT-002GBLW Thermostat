@@ -1,0 +1,88 @@
+I used tuya-convert to convert this device to tasmota and then use mqtt to communicate with it.
+
+This was done starting with the following:
+  https://github.com/klausahrenberg/WThermostatBeca
+I was then led to a forked version here:
+  https://github.com/fashberg/WThermostatBeca
+
+The actual conversion to tasmota was done using this:
+  https://github.com/ct-Open-Source/tuya-convert
+
+All went smoothly, requiring no hardware.
+It now provides a sensor of the floor temperature as well as the room temperature. Since my thermostat is not in the room
+it was crucial to drive the control of the devie based upon the floor temperature sensor.
+
+To get the device doing what I wanted I have the following bits of yaml
+
+A climate device, I have created this because my objective is to control the heating based upon the temperature of
+the floor sensor not the room temperature. 
+
+climate:
+  - platform: mqtt
+    name: OZ_Ensuite_Thermostat
+    availability_topic: "oz_ensuite/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    action_topic: "oz_ensuite/stat/things/thermostat/properties"
+    action_template: "{{value_json.action}}"
+    temperature_command_topic: "oz_ensuite/cmnd/things/thermostat/properties/targetTemperature"
+    temperature_state_topic: "oz_ensuite/stat/things/thermostat/properties"
+    temperature_state_template: "{{value_json.targetTemperature}}"
+    # set current temp to temp of floor sensor not room temp
+    current_temperature_topic: "oz_ensuite/stat/things/thermostat/properties"
+    current_temperature_template: "{{value_json.floorTemperature}}"
+    away_mode_command_topic: "oz_ensuite/cmnd/things/thermostat/properties/ecoMode"
+    away_mode_state_topic: "oz_ensuite/stat/things/thermostat/properties"
+    away_mode_state_template: "{{value_json.ecoMode}}"
+    mode_command_topic: "oz_ensuite/cmnd/things/thermostat/properties/mode"
+    mode_state_topic: "oz_ensuite/stat/things/thermostat/properties"
+    mode_state_template: "{{value_json.mode}}"
+    payload_on: "true"
+    payload_off: "false"
+    modes: [ "heat", "auto", "off" ]
+    min_temp: 5
+    max_temp: 35
+    temp_step: 0.5
+    precision: 0.5
+    
+An example of a switch:
+ 
+switch:
+# BHT-002 GBLW thermostat control
+  - platform: mqtt
+    unique_id: oz_ensuite_switch
+    name: "Oz Ensuite Thermostat Switch"
+    state_topic: "oz_ensuite/stat/things/thermostat/properties"
+    value_template: >
+      {{ value_json.deviceOn }}
+    command_topic: "oz_ensuite/cmnd/things/thermostat/properties/mode"
+    payload_on: 'heat'
+    payload_off: 'off'
+    state_on: true
+    state_off: false    
+    optimistic: false
+    qos: 0
+    retain: true
+
+An example of a sensor:
+
+sensor:
+- platform: mqtt
+  name: oz_ensuite_target_temperature
+  state_topic: "oz_ensuite/stat/things/thermostat/properties"
+  value_template: >
+    {{ value_json.targetTemperature }}
+  unit_of_measurement: '°C'
+  device_class: temperature
+  
+An example action for an automation:
+  
+    action:
+  # set the heating to the target temp
+    - service: mqtt.publish
+      data_template:
+        topic: "oz_ensuite/cmnd/things/thermostat/properties/targetTemperature"
+        payload: >
+          {{ states('sensor.floor_target_temp')|float }}
+        qos: 0
+        retain: true    
