@@ -24,11 +24,19 @@ climate:
     payload_available: "Online"
     payload_not_available: "Offline"
     action_topic: "oz_ensuite/stat/things/thermostat/properties"
-    action_template: "{{value_json.action}}"
+#    action_template: "{{value_json.action}}"
+# extra code added here to get the display to show Idle when up to target temp. The current tasmota software always reports 'heat' when not off.
+# even though the relay has switched off and the device itself is not indicating heating.
+    action_template: >
+      {% if (value_json.targetTemperature|float <= value_json.floorTemperature|float) and value_json.action == 'heating' %}
+        idle
+      {% else %}
+       {{value_json.action}}
+      {%endif%}
     temperature_command_topic: "oz_ensuite/cmnd/things/thermostat/properties/targetTemperature"
     temperature_state_topic: "oz_ensuite/stat/things/thermostat/properties"
     temperature_state_template: "{{value_json.targetTemperature}}"
-    # set current temp to temp of floor sensor not room temp
+    # set current temp to temp of floor sensor not room temp sensor
     current_temperature_topic: "oz_ensuite/stat/things/thermostat/properties"
     current_temperature_template: "{{value_json.floorTemperature}}"
     away_mode_command_topic: "oz_ensuite/cmnd/things/thermostat/properties/ecoMode"
@@ -39,11 +47,12 @@ climate:
     mode_state_template: "{{value_json.mode}}"
     payload_on: "true"
     payload_off: "false"
-    modes: [ "heat", "auto", "off" ]
+    modes: [ "heat", "auto","idle", "off" ]
     min_temp: 5
     max_temp: 35
     temp_step: 0.5
     precision: 0.5
+    
     
 An example of a switch:
  
