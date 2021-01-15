@@ -1,0 +1,8 @@
+
+Display the number of minutes between start and stop of xiaomi vacuum.
+
+(as_timestamp(state_attr('vacuum.xiaomi_vacuum_cleaner','clean_stop')) -
+      as_timestamp(state_attr('vacuum.xiaomi_vacuum_cleaner','clean_start'))) |
+      timestamp_custom('%H',false) |int *60 + (as_timestamp(state_attr('vacuum.xiaomi_vacuum_cleaner','clean_stop')) -
+      as_timestamp(state_attr('vacuum.xiaomi_vacuum_cleaner','clean_start'))) |
+      timestamp_custom('%M',false)|int }}
